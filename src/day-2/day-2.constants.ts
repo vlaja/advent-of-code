@@ -1,4 +1,4 @@
-import { Hand, HandSymbols, Outcome, WinningConditions } from './day-2.types';
+import { Hand, Outcome } from './day-2.types';
 
 export const HandValue: Record<Hand, number> = {
   Rock: 1,
@@ -12,13 +12,7 @@ export const OutcomeValue: Record<Outcome, number> = {
   Win: 6,
 };
 
-export const HandSymbolsMap: HandSymbols = {
-  Rock: ['A', 'X'],
-  Paper: ['B', 'Y'],
-  Scissors: ['C', 'Z'],
-};
-
-export const WinningConditionsMap: WinningConditions = {
+export const WinningConditionsMap: Record<Hand, Hand> = {
   Rock: 'Scissors',
   Paper: 'Rock',
   Scissors: 'Paper',
