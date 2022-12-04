@@ -1,23 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { Day1Service } from './day-1/day-1.service';
-import { Day2Service } from './day-2/day-2.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { IDailyChallengeService } from './daily-challenge/daily-challenge.types';
 
 @Injectable()
 export class AppService {
   constructor(
-    private readonly day1Service: Day1Service,
-    private readonly day2Service: Day2Service,
+    @Inject('DailyServices')
+    private readonly services: IDailyChallengeService[],
   ) {}
 
-  solveDailyChallenge(day: string, part: string) {
-    const numericPart = parseInt(part);
-    switch (parseInt(day)) {
+  private _getServicePart(part: number, service: IDailyChallengeService) {
+    switch (part) {
       case 1:
-        return numericPart === 1
-          ? this.day1Service.solveFirstPart()
-          : this.day1Service.solveSecondPart();
+        return service.solveFirstPart();
       case 2:
-        return numericPart === 1 ? this.day2Service.solveFirstPart() : null;
+        return service.solveSecondPart();
     }
+  }
+
+  solveDailyChallenge(day: string, part: string) {
+    const challengePart = parseInt(part);
+    const dailyService = this.services[parseInt(day) - 1];
+    return this._getServicePart(challengePart, dailyService);
   }
 }
