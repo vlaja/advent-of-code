@@ -18,13 +18,32 @@ export class Day3Service implements IDailyChallengeService {
       .pipe(map(this._processData));
   }
 
-  private _splitCompartments = (rucksack: string): [string[], string[]] => {
+  private _splitCompartments = (rucksack: string): string[] => {
     const half = Math.floor(rucksack.length / 2);
-    return [rucksack.slice(0, half).split(''), rucksack.slice(half).split('')];
+    return [rucksack.slice(0, half), rucksack.slice(half)];
   };
 
-  private _findMatchingCharacter = ([left, right]: [string[], string[]]) =>
-    left.find((item) => right.includes(item)) || '';
+  private _splitGroups = (rucksacks: string[], chunkSize: number) =>
+    [...Array(Math.ceil(rucksacks.length / chunkSize))].map(() =>
+      rucksacks.splice(0, chunkSize),
+    );
+
+  private _findDuplicateCharacters = (characters: string[]) => {
+    const result = characters.reduce(
+      (acc: Record<string, number>, cur: string) => {
+        const curArr = [...new Set(cur.split(''))];
+        curArr.forEach((char) => (acc[char] = (acc[char] || 0) + 1));
+        return acc;
+      },
+      {},
+    );
+
+    const [matchingLetter] = Object.keys(result).sort(
+      (a, b) => result[b] - result[a],
+    );
+
+    return matchingLetter;
+  };
 
   private _calculatePoints = (character: string) => {
     const value = this.lowPriority.indexOf(character) + 1;
@@ -33,21 +52,29 @@ export class Day3Service implements IDailyChallengeService {
   };
 
   private _processData = (response: AxiosResponse<string, string>) => {
-    return response.data
-      .trimEnd()
-      .split('\n')
-      .map(this._splitCompartments)
-      .map(this._findMatchingCharacter)
-      .map(this._calculatePoints);
+    return response.data.trimEnd().split('\n');
   };
 
   solveFirstPart() {
     return this._processInput().pipe(
-      map((data) => data.reduce((acc, cur) => acc + cur, 0)),
+      map((data) =>
+        data
+          .map(this._splitCompartments)
+          .map(this._findDuplicateCharacters)
+          .map(this._calculatePoints)
+          .reduce((acc, cur) => acc + cur, 0),
+      ),
     );
   }
 
   solveSecondPart() {
-    return this._processInput().pipe(map(console.log));
+    return this._processInput().pipe(
+      map((data) =>
+        this._splitGroups(data, 3)
+          .map(this._findDuplicateCharacters)
+          .map(this._calculatePoints)
+          .reduce((acc, cur) => acc + cur, 0),
+      ),
+    );
   }
 }
