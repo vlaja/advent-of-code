@@ -26,28 +26,47 @@ export class Day4Service implements IDailyChallengeService {
   };
 
   private _getPositions(elfs: number[][]) {
-    return elfs.map((arr) => {
-      const [min, max] = arr;
-      const keys = max - min;
-      return [...Array(keys + 1).keys()].map((i) => i + min);
-    });
+    return elfs
+      .map((arr) => {
+        const [min, max] = arr;
+        const keys = max - min;
+        return [...Array(keys + 1).keys()].map((i) => i + min);
+      })
+      .sort((a, b) => b.length - a.length);
   }
 
-  private _reducePositions(acc: number[], cur: number[]) {
+  private _reducePositions(
+    acc: number[],
+    cur: number[],
+    validator: (acc: number[], cur: number[]) => boolean,
+  ) {
     if (!acc.length) {
       acc = cur;
       return acc;
     }
 
-    const fullyEncloses = cur.every((val) => acc.includes(val));
-    if (!fullyEncloses) acc = [];
+    if (!validator(acc, cur)) acc = [];
     return acc;
   }
 
   private _filterFullMatches = (positionSets: number[][]) => {
-    return positionSets
-      .sort((a, b) => b.length - a.length)
-      .reduce(this._reducePositions, []);
+    const validator = (acc: number[], cur: number[]) =>
+      cur.every((val) => acc.includes(val));
+
+    return positionSets.reduce(
+      (acc, cur) => this._reducePositions(acc, cur, validator),
+      [],
+    );
+  };
+
+  private _filterOverlaps = (positionSets: number[][]) => {
+    const validator = (acc: number[], cur: number[]) =>
+      cur.some((val) => acc.includes(val));
+
+    return positionSets.reduce(
+      (acc, cur) => this._reducePositions(acc, cur, validator),
+      [],
+    );
   };
 
   solveFirstPart() {
@@ -63,6 +82,14 @@ export class Day4Service implements IDailyChallengeService {
   }
 
   solveSecondPart() {
-    return this._processInput().pipe(map((data) => console.log(data)));
+    return this._processInput().pipe(
+      map(
+        (assignmentPair) =>
+          assignmentPair
+            .map(this._getPositions)
+            .map(this._filterOverlaps)
+            .filter((val) => val.length > 0).length,
+      ),
+    );
   }
 }
