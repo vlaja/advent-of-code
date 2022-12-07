@@ -12,6 +12,8 @@ import { Day4Module } from './day-4/day-4.module';
 import { Day4Service } from './day-4/day-4.service';
 import { Day5Module } from './day-5/day-5.module';
 import { Day5Service } from './day-5/day-5.service';
+import { Day6Module } from './day-6/day-6.module';
+import { Day6Service } from './day-6/day-6.service';
 
 @Module({
   imports: [
@@ -21,13 +23,21 @@ import { Day5Service } from './day-5/day-5.service';
     Day3Module,
     Day4Module,
     Day5Module,
+    Day6Module,
   ],
   controllers: [AppController],
   providers: [
     {
       provide: 'DailyServices',
       useFactory: (...params) => params,
-      inject: [Day1Service, Day2Service, Day3Service, Day4Service, Day5Service],
+      inject: [
+        Day1Service,
+        Day2Service,
+        Day3Service,
+        Day4Service,
+        Day5Service,
+        Day6Service,
+      ],
     },
     AppService,
   ],
