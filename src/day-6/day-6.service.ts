@@ -15,11 +15,26 @@ export class Day6Service implements IDailyChallengeService {
   }
 
   private _processData = (response: AxiosResponse<string, string>) => {
-    return response.data.trimEnd();
+    return response.data
+      .trimEnd()
+      .split('')
+      .reduce(
+        (acc: { signal: string; markers: number[] }, cur) => {
+          acc.signal = acc.signal + cur;
+          const lastFour = acc.signal.slice(-4).split('');
+          const areLastFourUnique = [...new Set(lastFour)].length === 4;
+          if (areLastFourUnique) acc.markers.push(acc.signal.length);
+          return acc;
+        },
+        {
+          signal: '',
+          markers: [],
+        },
+      );
   };
 
   solveFirstPart() {
-    return this._processInput().pipe(map((data) => console.log(data)));
+    return this._processInput().pipe(map((data) => data.markers[0]));
   }
   solveSecondPart() {
     return this._processInput().pipe(map((data) => console.log(data)));
