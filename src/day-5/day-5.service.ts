@@ -4,6 +4,8 @@ import { map } from 'rxjs';
 import { DailyChallengeService } from '../daily-challenge/daily-challenge.service';
 import { IDailyChallengeService } from '../daily-challenge/daily-challenge.types';
 
+type ChallengeData = [Record<number, string[]>, number[][]];
+
 @Injectable()
 export class Day5Service implements IDailyChallengeService {
   constructor(private readonly dailyChallengeService: DailyChallengeService) {}
@@ -70,33 +72,39 @@ export class Day5Service implements IDailyChallengeService {
       );
   };
 
-  private _moveCrates([positions, instructions]: [
-    Record<number, string[]>,
-    number[][],
-  ]) {
-    for (const instruction of instructions) {
-      const [amount, from, to] = instruction;
-      positions[to] = [
-        ...positions[to],
-        ...positions[from].slice(-amount).reverse(),
-      ];
-
-      positions[from] = positions[from].slice(0, -amount);
-    }
-
+  private _getKeyword(positions: Record<number, string[]>) {
     return Object.values(positions)
       .map((val) => val.pop() || ' ')
       .join('')
       .replace(/[(\[+)(\]+)]/gm, '');
   }
 
+  private _moveCrates(
+    [positions, instructions]: ChallengeData,
+    order: 'baseline' | 'reverse',
+  ) {
+    for (const instruction of instructions) {
+      const [amount, from, to] = instruction;
+      const elementsToMove = positions[from].slice(-amount);
+      if (order === 'reverse') elementsToMove.reverse();
+
+      positions[to] = [...positions[to], ...elementsToMove];
+      positions[from] = positions[from].slice(0, -amount);
+    }
+
+    return positions;
+  }
+
   solveFirstPart() {
     return this._processInput().pipe(
-      map(this._moveCrates),
-      // map((positions) => console.log(positions)),
+      map((data: ChallengeData) => this._moveCrates(data, 'reverse')),
+      map(this._getKeyword),
     );
   }
   solveSecondPart() {
-    return this._processInput().pipe(map((assignmentPair) => assignmentPair));
+    return this._processInput().pipe(
+      map((data: ChallengeData) => this._moveCrates(data, 'baseline')),
+      map(this._getKeyword),
+    );
   }
 }
