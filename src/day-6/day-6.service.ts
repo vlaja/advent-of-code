@@ -14,29 +14,46 @@ export class Day6Service implements IDailyChallengeService {
       .pipe(map(this._processData));
   }
 
+  private _areLastNUnique = (signal: string) => (n: number) =>
+    [...new Set(signal.slice(-n).split(''))].length === n;
+
   private _processData = (response: AxiosResponse<string, string>) => {
     return response.data
       .trimEnd()
       .split('')
       .reduce(
-        (acc: { signal: string; markers: number[] }, cur) => {
+        (
+          acc: {
+            signal: string;
+            packetMarkers: number[];
+            messageMarkers: number[];
+          },
+          cur,
+        ) => {
           acc.signal = acc.signal + cur;
-          const lastFour = acc.signal.slice(-4).split('');
-          const areLastFourUnique = [...new Set(lastFour)].length === 4;
-          if (areLastFourUnique) acc.markers.push(acc.signal.length);
+          const uniqueCharacters = this._areLastNUnique(acc.signal);
+          if (uniqueCharacters(4)) {
+            acc.packetMarkers.push(acc.signal.length);
+          }
+
+          if (uniqueCharacters(14)) {
+            acc.messageMarkers.push(acc.signal.length);
+          }
+
           return acc;
         },
         {
           signal: '',
-          markers: [],
+          packetMarkers: [],
+          messageMarkers: [],
         },
       );
   };
 
   solveFirstPart() {
-    return this._processInput().pipe(map((data) => data.markers[0]));
+    return this._processInput().pipe(map((data) => data.packetMarkers[0]));
   }
   solveSecondPart() {
-    return this._processInput().pipe(map((data) => console.log(data)));
+    return this._processInput().pipe(map((data) => data.messageMarkers[0]));
   }
 }
