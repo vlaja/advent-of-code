@@ -14,6 +14,8 @@ import { Day5Module } from './day-5/day-5.module';
 import { Day5Service } from './day-5/day-5.service';
 import { Day6Module } from './day-6/day-6.module';
 import { Day6Service } from './day-6/day-6.service';
+import { Day7Module } from './day-7/day-7.module';
+import { Day7Service } from './day-7/day-7.service';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { Day6Service } from './day-6/day-6.service';
     Day4Module,
     Day5Module,
     Day6Module,
+    Day7Module,
   ],
   controllers: [AppController],
   providers: [
@@ -37,6 +40,7 @@ import { Day6Service } from './day-6/day-6.service';
         Day4Service,
         Day5Service,
         Day6Service,
+        Day7Service,
       ],
     },
     AppService,
