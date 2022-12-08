@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
 import { Injectable } from '@nestjs/common';
-import { map, Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
+import { Observable } from 'rxjs';
 
 interface IDailyChallengeService {
   getDailyChallengeInput(
