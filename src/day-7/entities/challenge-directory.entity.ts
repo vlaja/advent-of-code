@@ -1,15 +1,15 @@
 import { ChallengeFile } from './challenge-file.entity';
 
 export interface ChallengeDirectory {
-  path: string;
+  name: string;
   directories: ChallengeDirectory[];
   files: ChallengeFile[];
   size: number;
 }
 
 export class ChallengeDirectory {
-  constructor(path: string) {
-    this.path = path;
+  constructor(name: string) {
+    this.name = name;
     this.directories = [];
     this.files = [];
     this.size = 0;
@@ -22,7 +22,9 @@ export class ChallengeDirectory {
   }
 
   createFile(path: string, size: number) {
-    this.files.push(new ChallengeFile(path, size));
+    const newFile = new ChallengeFile(path, size);
+    this.files.push(newFile);
     this.size += size;
+    return newFile;
   }
 }

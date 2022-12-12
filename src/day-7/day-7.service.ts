@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { map, reduce } from 'rxjs';
 import { DailyChallengeService } from '../daily-challenge/daily-challenge.service';
 import { IDailyChallengeService } from '../daily-challenge/daily-challenge.types';
-import { ChallengeDirectory } from './entities/challenge-directory.entity';
 import { ChallengeFileSystem } from './entities/challenge-file-system.entity';
 
 @Injectable()
@@ -16,37 +15,24 @@ export class Day7Service implements IDailyChallengeService {
       .pipe(map(this._processData));
   }
 
-  private _getPreviousDirectoryFromPath(path: string) {
-    return path.split('/').slice(0, -1).join('/');
-  }
-
   private _createFileSystem = (
     fileSystem: ChallengeFileSystem,
     instruction: string[],
   ) => {
     const [cmdOrSize, name] = instruction;
-    let path = fileSystem.currentDirectory.path;
-    if (name == '..') {
-      path =
-        this._getPreviousDirectoryFromPath(path) ||
-        fileSystem.rootDirectory.path;
+    if (cmdOrSize === 'cd') {
+      name == '..' ? fileSystem.goBack() : fileSystem.changeDirectory(name);
+    }
+
+    if (cmdOrSize === 'dir') {
+      fileSystem.createDirectory(name);
     }
 
     const fileSize = parseInt(cmdOrSize);
     if (fileSize) {
-      fileSystem.currentDirectory.createFile(name, fileSize);
+      fileSystem.createFile(name, fileSize);
     }
 
-    if (cmdOrSize === 'dir') {
-      path = path === name ? name : `${path}/${name}`;
-    }
-
-    path = path.replace('//', '/');
-    if (!fileSystem.paths[path]) {
-      fileSystem.paths[path] = new ChallengeDirectory(path);
-    }
-
-    fileSystem.currentDirectory = fileSystem.paths[path];
     return fileSystem;
   };
 
@@ -60,10 +46,8 @@ export class Day7Service implements IDailyChallengeService {
 
   solveFirstPart() {
     return this._processInput().pipe(
-      map((data) => {
-        console.log(Object.keys(data.paths));
-        return [];
-      }),
+      map((data) => data.getBigDirectories()),
+      map((data) => data),
     );
   }
 
