@@ -7,6 +7,7 @@ export interface ChallengeFileSystem {
   currentDirectoryPath: string;
   paths: Record<string, ChallengeDirectory | ChallengeFile>;
   size: number;
+  totalSize: number;
 }
 
 export class ChallengeFileSystem {
@@ -16,6 +17,7 @@ export class ChallengeFileSystem {
     this.currentDirectory = this.rootDirectory;
     this.currentDirectoryPath = rootPath;
     this.size = 0;
+    this.totalSize = 70000000;
   }
 
   private _getPreviousDirectoryFromPath(path: string) {
@@ -96,7 +98,17 @@ export class ChallengeFileSystem {
     const maxSize = 100000;
     return this.getPathValuePairs()
       .filter(([, entry]) => entry.size <= maxSize)
-      .map(([, entry]) => entry)
-      .reduce((acc, entry) => acc + entry.size, 0);
+      .map(([, entry]) => entry);
+  }
+
+  getNextDirectoryToDelete() {
+    const minFreeSpace = 30000000;
+    const availableSpace = this.totalSize - this.size;
+    const spaceToFreeUp = minFreeSpace - availableSpace;
+    const [[, dir]] = this.getPathValuePairs()
+      .filter(([, entry]) => entry.size >= spaceToFreeUp)
+      .sort((a, b) => a[1].size - b[1].size);
+
+    return dir;
   }
 }

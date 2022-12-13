@@ -47,11 +47,14 @@ export class Day7Service implements IDailyChallengeService {
   solveFirstPart() {
     return this._processInput().pipe(
       map((data) => data.getBigDirectories()),
-      map((data) => data),
+      map((dirs) => dirs.reduce((acc, entry) => acc + entry.size, 0)),
     );
   }
 
   solveSecondPart() {
-    return this._processInput().pipe(map((data) => console.log(data)));
+    return this._processInput().pipe(
+      map((data) => data.getNextDirectoryToDelete()),
+      map((folder) => folder.size),
+    );
   }
 }
