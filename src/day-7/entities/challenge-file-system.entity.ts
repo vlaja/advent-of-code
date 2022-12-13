@@ -94,17 +94,9 @@ export class ChallengeFileSystem {
 
   getBigDirectories() {
     const maxSize = 100000;
-    const bigFolders = this.getPathValuePairs()
+    return this.getPathValuePairs()
       .filter(([, entry]) => entry.size <= maxSize)
-      .map(([path]) => path)
-      .reduce((acc, path) => {
-        const hasMatchingRoot = acc.find((p) => path.includes(p));
-        if (!acc.length || !hasMatchingRoot) acc.push(path);
-        return acc;
-      }, new Array<string>());
-
-    return Object.entries(this.paths)
-      .filter(([path]) => bigFolders.includes(path))
-      .reduce((acc, [, entry]) => acc + entry.size, 0);
+      .map(([, entry]) => entry)
+      .reduce((acc, entry) => acc + entry.size, 0);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
-import { map, reduce } from 'rxjs';
+import { map } from 'rxjs';
 import { DailyChallengeService } from '../daily-challenge/daily-challenge.service';
 import { IDailyChallengeService } from '../daily-challenge/daily-challenge.types';
 import { ChallengeFileSystem } from './entities/challenge-file-system.entity';
